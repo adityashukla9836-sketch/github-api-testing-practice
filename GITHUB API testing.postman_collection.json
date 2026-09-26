@@ -1,0 +1,499 @@
+{
+  "info": {
+    "_postman_id": "dce1209f-30dd-45df-8e1e-1d6b7beb9530",
+    "name": "GITHUB API testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58422124",
+    "_collection_link": "https://go.postman.co/collection/58422124-dce1209f-30dd-45df-8e1e-1d6b7beb9530?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get My Profile ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Username matches my GitHub account\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.login).to.eql(\"adityashukla9836-sketch\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token_classic}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/user",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "user"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Profile-No Auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Rejected without a token\", function () {\r\n    pm.response.to.have.status(401);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{github_token_classic}}",
+            "disabled": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "url": {
+          "raw": "https://api.github.com/user",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "user"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Check Rate - Limit",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Rate limit header exists\", function () {\r\n    pm.expect(pm.response.headers.has(\"X-RateLimit-Limit\")).to.be.true;\r\n});\r\n\r\npm.test(\"Remaining calls is a valid number\", function () {\r\n    const remaining = Number(pm.response.headers.get(\"X-RateLimit-Remaining\"));\r\n    pm.expect(remaining).to.be.a(\"number\");\r\n    pm.expect(remaining).to.be.at.least(0);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/rate_limit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "rate_limit"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create_Repo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Repo name matches what we sent\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.name).to.eql(pm.environment.get(\"repo_name\"));\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"{{repo_name}}\",\r\n  \"description\": \"Created via Postman for API testing practice\",\r\n  \"private\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/user/repos",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "user",
+            "repos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Repo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Repo is marked private\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.private).to.eql(true);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/repos/adityashukla9836-sketch/postman-test-repo",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "repos",
+            "adityashukla9836-sketch",
+            "postman-test-repo"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Repo-Not Found",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/repos/adityashukla9836-sketch/postman-test-repo",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "repos",
+            "adityashukla9836-sketch",
+            "postman-test-repo"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Repo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 204 (deleted, no content)\", function () {\r\n    pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}{"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/repos/adityashukla9836-sketch/postman-test-repo",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "repos",
+            "adityashukla9836-sketch",
+            "postman-test-repo"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Repos -page 1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Returned exactly 5 repos\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.length).to.eql(5);\r\n});\r\n\r\npm.test(\"Link header exists for pagination\", function () {\r\n    pm.expect(pm.response.headers.has(\"Link\")).to.be.true;\r\n});\r\n\r\npm.test(\"Link header contains a next page\", function () {\r\n    const link = pm.response.headers.get(\"Link\");\r\n    pm.expect(link).to.include('rel=\"next\"');\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/users/torvalds/repos?per_page=5&page=1",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "users",
+            "torvalds",
+            "repos"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": "5"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Repos -page 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Returned exactly 5 repos\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.length).to.eql(5);\r\n});\r\n\r\npm.test(\"Link header exists for pagination\", function () {\r\n    pm.expect(pm.response.headers.has(\"Link\")).to.be.true;\r\n});\r\n\r\npm.test(\"Link header contains a prev page\", function () {\r\n    const link = pm.response.headers.get(\"Link\");\r\n    pm.expect(link).to.include('rel=\"prev\"');\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{github_token_classic}}{"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.github+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.github.com/users/torvalds/repos?per_page=5&page=2",
+          "protocol": "https",
+          "host": [
+            "api",
+            "github",
+            "com"
+          ],
+          "path": [
+            "users",
+            "torvalds",
+            "repos"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": "5"
+            },
+            {
+              "key": "page",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "github_personal_access_token_0yhf",
+      "secret": true
+    }
+  ]
+}
